@@ -5,17 +5,18 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -90,10 +91,13 @@ import java.util.Map;
 
 
     //Memory Advisor - will keep chat history otherwise LLM wont rememebr the context or history. It wont store
-    //Its contuniatution of above,adding memory or advisor
+    //Its continuation of above,adding memory or advisor
 @RestController
 @RequestMapping("/api")
 public class OpenAIController {
+
+    @Autowired
+    private VectorStore vectorStore;
 
     @Qualifier("openAiChatModel")
     private ChatClient chatClient;
@@ -136,6 +140,7 @@ public class OpenAIController {
     }
 
 
+    //Example of Prompt template
     @PostMapping("/recommend")
     public String recommend(@RequestParam String type, @RequestParam String lang, @RequestParam int year){
 
@@ -184,5 +189,12 @@ public class OpenAIController {
         }
 
         return dotProduct * 100 / (Math.sqrt(norm1) * Math.sqrt(norm2));
+    }
+
+    @PostMapping("/product")
+    public List<Document> getProducts(@RequestParam String text){
+
+        System.out.println(text);
+        return vectorStore.similaritySearch(text);
     }
 }
