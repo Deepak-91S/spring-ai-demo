@@ -19,7 +19,8 @@ public class DataInitializer {
     @Autowired
     private VectorStore vectorStore;
 
-    @PostConstruct
+    //commented below annotation to stop creating embeddings on each start
+//    @PostConstruct
     public void initData(){
 
         TextReader textReader = new TextReader(new ClassPathResource("product_details.txt"));
